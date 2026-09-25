@@ -150,11 +150,16 @@ def loadGun(totalBullets):
 def turn():
     global currentPlayer, currentBulletLive, currentBullet, loadout, players_list, sawed
     global player1Health, player2Health, player3Health, player4Health, jammed
+    global player1Items, player2Items, player3Items, player4Items
 
     # Skip jammed player
     if jammed[currentPlayer]:
         print(f"\n{players_list[currentPlayer]} is jammed and skips their turn!")
         jammed[currentPlayer] = False
+        currentPlayer = (currentPlayer + 1) % players
+        return
+    if (player1Health <= 0 and currentPlayer == 0) or (player2Health <= 0 and currentPlayer == 1) or (player3Health <= 0 and currentPlayer == 2) or (player4Health <= 0 and currentPlayer == 3):
+        print(f"\n{players_list[currentPlayer]} is dead")
         currentPlayer = (currentPlayer + 1) % players
         return
 
@@ -219,7 +224,68 @@ def turn():
             break
 
         elif choice == "item":
-            print("Item mechanic placeholder - implement item selection here.")
-            break
+            print("Players' items:")
+            if currentPlayer == 0:
+                print(f"  {players_list[currentPlayer]}: {player1Items}")
+            elif currentPlayer == 1:
+                print(f"  {players_list[currentPlayer]}: {player2Items}")
+            elif currentPlayer == 2:
+                print(f"  {players_list[currentPlayer]}: {player3Items}")
+            elif currentPlayer == 3:
+                print(f"  {players_list[currentPlayer]}: {player4Items}")
+            print("Use an item by typing its name. Type 'back' to go back.")
+            item_input = input("Enter the name of the item you want to use: ").strip()
+            if item_input.lower() == "back":
+                continue
+            elif item_input in itemList:
+                
+                if item_input == "Hand Saw":
+                    sawed = True
+                    print(f"The next shot will deal double damage... If it's live")
+                
+                elif item_input == "Jammer":
+                    item_target_input = input(f"Who do you want to jam? {players_list}: ").strip()
+                    matched_item_target = None
+                    if item_target_input.lower() == players_list[currentPlayer].lower():
+                        print("You cannot jam yourself. Try again.")
+                        continue
+                    if item_target_input.lower() == players_list[0].lower():
+                        matched_item_target = players_list[0]
+                    elif item_target_input.lower() == players_list[1].lower():
+                        matched_item_target = players_list[1]
+                    elif players >= 3 and item_target_input.lower() == players_list[2].lower():
+                        matched_item_target = players_list[2]
+                    elif players == 4 and item_target_input.lower() == players_list[3].lower():
+                        matched_item_target = players_list[3]
+                    if matched_item_target:
+                        target_index = players_list.index(matched_item_target)
+                        jammed[target_index] = True
+                        print(f"{matched_item_target} has been jammed and will skip their next turn!")
+
+                elif item_input == "Magnifying Glass":
+                    print(f"The next bullet is: {loadout[currentBullet]}")
+                    t.sleep(1)
+                
+                elif item_input == "Inverter":
+                    loadout[currentBullet] = "Live" if loadout[currentBullet] == "Blank" else "Blank"
+                    print(f"The next bullet has been inverted")
+
+                elif item_input == "Burner Phone":
+                    # Ensure there are enough future bullets left in the loadout
+                    min_future_index = currentbullet + 1  # Look at least 1 bullet ahead
+                    max_future_index = len(loadout) - 1   # Last valid index in loadout list
+
+                    if min_future_index <= max_future_index:
+                      future_idx = r.randint(min_future_index, max_future_index)
+                      print(f"[Burner Phone]: Bullet #{future_idx + 1} is {loadout[future_idx]}.")
+                    else:
+                        print("[Burner Phone]: How unfortunate...")
+
+                elif item_input == "Beer":
+                    print(f"Racked the shotgun. out came a {loadout[currentBullet]}")
+                    currentBullet =+ 1
+                    
+            else:
+                print("Invalid item. Try again.")
         else:
             print("Invalid option. Please enter 'shoot' or 'item'.")
