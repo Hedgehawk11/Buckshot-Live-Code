@@ -263,12 +263,12 @@ def turn():
                         print(f"{matched_item_target} has been jammed and will skip their next turn!")
 
                 elif item_input == "Magnifying Glass":
-                    print(f"The next bullet is: {loadout[currentBullet]}")
+                    print(f"The bullet is: {loadout[currentBullet]}")
                     t.sleep(1)
                 
                 elif item_input == "Inverter":
                     loadout[currentBullet] = "Live" if loadout[currentBullet] == "Blank" else "Blank"
-                    print(f"The next bullet has been inverted")
+                    print(f"The bullet has been inverted")
 
                 elif item_input == "Burner Phone":
                     # Ensure there are enough future bullets left in the loadout
@@ -284,7 +284,19 @@ def turn():
                 elif item_input == "Beer":
                     print(f"Racked the shotgun. out came a {loadout[currentBullet]}")
                     currentBullet =+ 1
-                    
+                elif item_input == "Cigarettes":
+                    print(f"Gained a health point.")
+                    if currentPlayer == 0:
+                        player1Health = min(player1Health + 1, maxHealth)
+                    elif currentPlayer == 1:
+                        player2Health = min(player2Health + 1, maxHealth)
+                    elif currentPlayer == 2:
+                        player3Health = min(player3Health + 1, maxHealth)
+                    elif currentPlayer == 3:
+                        player4Health = min(player4Health + 1, maxHealth)
+                elif item_input == "Remote":
+                    print(f"Turn order of players has been reversed.")
+                    players_list.reverse()                    
             else:
                 print("Invalid item. Try again.")
         else:
