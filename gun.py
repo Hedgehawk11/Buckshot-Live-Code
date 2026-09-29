@@ -35,6 +35,7 @@ currentBullet = 0
 itemList = ["Hand Saw", "Magnifying Glass", "Inverter", "Burner Phone", "Beer", "Cigarettes", "Jammer"]
 sawed = False
 jammed = [False] * 4
+playersLeft = 0
 
 #get players
 while True:
@@ -128,6 +129,7 @@ def healthHandout(healthPerPlayer):
         elif i == 3:
             player4Health = healthPerPlayer
     maxHealth = healthPerPlayer
+    print(f"{healthPerPlayer} health each.")
 
 def loadGun(totalBullets):
     global load, currentBulletLive, currentBullet, loadout
@@ -155,11 +157,13 @@ def turn():
     # Skip jammed player
     if jammed[currentPlayer]:
         print(f"\n{players_list[currentPlayer]} is jammed and skips their turn!")
+        t.sleep(0.5)
         jammed[currentPlayer] = False
         currentPlayer = (currentPlayer + 1) % players
         return
     if (player1Health <= 0 and currentPlayer == 0) or (player2Health <= 0 and currentPlayer == 1) or (player3Health <= 0 and currentPlayer == 2) or (player4Health <= 0 and currentPlayer == 3):
         print(f"\n{players_list[currentPlayer]} is dead")
+        t.sleep(2)
         currentPlayer = (currentPlayer + 1) % players
         return
 
@@ -272,7 +276,7 @@ def turn():
 
                 elif item_input == "Burner Phone":
                     # Ensure there are enough future bullets left in the loadout
-                    min_future_index = currentbullet + 1  # Look at least 1 bullet ahead
+                    min_future_index = currentBullet + 1  # Look at least 1 bullet ahead
                     max_future_index = len(loadout) - 1   # Last valid index in loadout list
 
                     if min_future_index <= max_future_index:
@@ -283,7 +287,7 @@ def turn():
 
                 elif item_input == "Beer":
                     print(f"Racked the shotgun. out came a {loadout[currentBullet]}")
-                    currentBullet =+ 1
+                    currentBullet += 1
                 elif item_input == "Cigarettes":
                     print(f"Gained a health point.")
                     if currentPlayer == 0:
@@ -296,8 +300,19 @@ def turn():
                         player4Health = min(player4Health + 1, maxHealth)
                 elif item_input == "Remote":
                     print(f"Turn order of players has been reversed.")
-                    players_list.reverse()                    
+                    players_list.reverse()  
+                                      
             else:
                 print("Invalid item. Try again.")
         else:
             print("Invalid option. Please enter 'shoot' or 'item'.")
+
+for i in range(roundCount):
+    print(f"Round {i + 1}")
+    healthHandout(r.randint(3, 5))
+    itemHandout(r.randint(2, 6))
+    t.sleep(1)
+    loadGun(r.randint(2, 6))
+    playersLeft = len(players_list)
+    while currentBullet < len(loadout) and playersLeft > 1:
+        turn()
